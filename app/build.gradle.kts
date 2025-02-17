@@ -67,6 +67,10 @@ dependencies {
 
     implementation(libs.androidx.material.icons.extended)
     implementation (libs.accompanist.permissions)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
 
 
 }

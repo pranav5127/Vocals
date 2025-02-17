@@ -1,6 +1,7 @@
 package com.app.sounds.ui.view
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,9 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.app.sounds.ui.theme.SoundsTheme
-import com.app.sounds.viewmodel.PlayerViewModel
 import com.app.sounds.viewmodel.RecorderViewModel
+import com.app.sounds.viewmodel.Screen
+import com.app.sounds.viewmodel.UploadViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 class RecordViewModelFactory(private val context: Context): ViewModelProvider.Factory{
@@ -51,25 +58,21 @@ class RecordViewModelFactory(private val context: Context): ViewModelProvider.Fa
         }
 }
 
-class PlayerViewModelFactory(private val context: Context): ViewModelProvider.Factory{
-    override fun <T: ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(PlayerViewModel::class.java)){
-            @Suppress("UNCHECKED_CAST")
-            return PlayerViewModel(context) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
 
-    }
-}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordSendAudioScreen() {
+fun RecordSendAudioScreen(
+    navController: NavController
+) {
     val context = LocalContext.current
     val recorderViewModel: RecorderViewModel = viewModel(
         factory = RecordViewModelFactory(context)
     )
+    val uploadViewModel: UploadViewModel = viewModel()
     val isRecording by recorderViewModel.isRecording.observeAsState(initial = false)
     val amplitude by recorderViewModel.amplitude.observeAsState(initial = 0f)
+    val outputFile by recorderViewModel.outputFile.observeAsState(initial = null)
 
 
 
@@ -115,9 +118,15 @@ fun RecordSendAudioScreen() {
                      if(isRecording){
                          recorderViewModel.stopRecording()
                          recorderViewModel.setAmplitude()
+                         outputFile?.let {file ->
+                             CoroutineScope(Dispatchers.IO).launch {
+                                        uploadViewModel.uploadAudioFile(file)
+                             }
+                         }
+
                      } else {
-                         val outputFile = File(context.filesDir, "audio.wav")
-                         recorderViewModel.startRecording(outputFile)
+                         val file = File(context.cacheDir, "audio.wav")
+                         recorderViewModel.startRecording(file)
                      }
                     },
                     modifier = Modifier
@@ -136,22 +145,20 @@ fun RecordSendAudioScreen() {
 
                     )
                 }
+                Button(
+                    onClick = {
+                        outputFile?.let { file ->
+                            val encodedPath = Uri.encode(file.absolutePath)
+                            navController.navigate("player_screen/$encodedPath")
+                        }
+                    }
+                ) {
+                    Text("Nav")
+                }
+
             }
         }
-
     }
 }
 
 
-
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-)
-@Composable
-fun RecordSendAudioScreenPreview(){
-    SoundsTheme(darkTheme = true) {
-        RecordSendAudioScreen()
-    }
-}

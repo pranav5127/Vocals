@@ -70,7 +70,6 @@ class AndroidAudioRecorder(private val context: Context):AudioRecorder {
                 if (bytesRead > 0) {
                     fileOutputStream.write(buffer, 0, bytesRead)
 
-                    // Calculate amplitude and send it to the listener
                     val amplitude = calculateAmplitude(buffer)
                     amplitudeListener?.invoke(amplitude.toFloat())
                 }

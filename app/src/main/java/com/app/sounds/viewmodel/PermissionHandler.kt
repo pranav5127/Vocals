@@ -3,6 +3,8 @@ package com.app.sounds.viewmodel
 import android.Manifest
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
+import com.app.sounds.ui.theme.SoundsTheme
 import com.app.sounds.ui.view.RecordSendAudioScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
@@ -16,7 +18,7 @@ fun GetPermission() {
 
     LaunchedEffect(key1 = micPermissionState.status) {
         if (micPermissionState.status != PermissionStatus.Granted){
-            micPermissionState.launchPermissionRequest()
+                micPermissionState.launchPermissionRequest()
         }
     }
 
@@ -25,12 +27,12 @@ fun GetPermission() {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun PermissionHandler(){
+fun PermissionHandler(navController: NavController){
     val micPermissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     if (micPermissionState.status != PermissionStatus.Granted){
-       GetPermission()
+            GetPermission()
     } else {
-        RecordSendAudioScreen()
+        RecordSendAudioScreen(navController)
     }
 
 }
