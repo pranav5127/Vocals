@@ -41,7 +41,7 @@ fun WaveformAnimation(amplitude: Float) {
         val path = Path().apply{
             moveTo(0f,centerY)
             lineTo(width,centerY)
-            for(i in 0 until 50){
+            for(i in 0 until 100){
                 val x = i *(width /100)
                 val y = centerY + sin(i * 0.2f) * animatedAmplitude.value * 100
                 lineTo(x, y)

@@ -1,15 +1,12 @@
 package com.app.sounds.ui.view
 
-import android.Manifest
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -42,9 +38,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.sounds.ui.theme.SoundsTheme
 import com.app.sounds.viewmodel.PlayerViewModel
 import com.app.sounds.viewmodel.RecorderViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import java.io.File
 
 class RecordViewModelFactory(private val context: Context): ViewModelProvider.Factory{
@@ -114,13 +107,14 @@ fun RecordSendAudioScreen() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    WaveformAnimation(amplitude)
+                    WaveformAnimation(amplitude * 20f)
                 }
             }
                 Button(
                     onClick = {
                      if(isRecording){
                          recorderViewModel.stopRecording()
+                         recorderViewModel.setAmplitude()
                      } else {
                          val outputFile = File(context.filesDir, "audio.wav")
                          recorderViewModel.startRecording(outputFile)
@@ -130,7 +124,7 @@ fun RecordSendAudioScreen() {
                         .padding(horizontal = 24.dp, vertical = 48.dp)
                         .size(84.dp)
                         .clip(shape = CircleShape),
-                    colors = ButtonDefaults.buttonColors(Color(0xFFE91E63)),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFE91E47)),
                     border = BorderStroke(3.dp, Color(0xC8FFFFFF))
 
                 ) {
@@ -146,39 +140,9 @@ fun RecordSendAudioScreen() {
         }
 
     }
-
 }
 
 
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun AudioPermissionHandler() {
-    val microphonePermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
-
-    // Request permission when the composable is first shown
-    LaunchedEffect(key1 = Unit) {
-        microphonePermissionState.launchPermissionRequest()
-    }
-
-    if (microphonePermissionState.status.isGranted) {
-        // Permission granted: show your recording UI
-        RecordSendAudioScreen()
-    } else {
-        // Permission denied: show a message explaining why the permission is needed
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Microphone permission is required to record audio.")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { microphonePermissionState.launchPermissionRequest() }) {
-                Text("Grant Permission")
-            }
-        }
-    }
-}
 
 
 @Preview(

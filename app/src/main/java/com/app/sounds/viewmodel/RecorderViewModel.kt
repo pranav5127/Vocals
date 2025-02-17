@@ -19,21 +19,23 @@ class RecorderViewModel(context: Context) : ViewModel(){
     fun startRecording(outputFile: File){
         viewModelScope.launch {
             audioRecorder.amplitudeListener = { amplitude ->
-                _amplitude.value = amplitude
+                _amplitude.postValue(amplitude)
             }
             audioRecorder.recordAudio(outputFile)
-            _isRecording.value = true
+            _isRecording.postValue(true)
         }
     }
 
     fun stopRecording(){
         viewModelScope.launch {
             audioRecorder.stop()
-            _isRecording.value = false
+            _isRecording.postValue(false)
         }
     }
 
-
+    fun setAmplitude(){
+        _amplitude.postValue(0f)
+    }
 
 
 }
