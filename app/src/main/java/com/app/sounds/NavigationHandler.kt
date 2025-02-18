@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-import com.app.sounds.ui.view.UploadFileScreen
+import com.app.sounds.ui.view.fileupload.UploadFileScreen
 import com.app.sounds.ui.view.response.ResponseScreen
 import com.app.sounds.viewmodel.PermissionHandler
 import com.app.sounds.viewmodel.Screen
@@ -24,7 +24,7 @@ fun NavigationHandler() {
         composable("${Screen.PlayerScreen.route}/{filePath}") { backStackEntry ->
             val filePath = backStackEntry.arguments?.getString("filePath")
             if (filePath != null) {
-                ResponseScreen(filePath)
+                ResponseScreen(filePath, navController)
             }
         }
     }

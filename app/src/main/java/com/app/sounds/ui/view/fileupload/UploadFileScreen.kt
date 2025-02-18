@@ -1,7 +1,6 @@
-package com.app.sounds.ui.view
+package com.app.sounds.ui.view.fileupload
 
 import androidx.compose.runtime.Composable
-import com.app.sounds.viewmodel.Screen
 
 @Composable
 fun UploadFileScreen(){
