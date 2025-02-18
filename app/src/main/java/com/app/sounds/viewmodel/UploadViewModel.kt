@@ -17,6 +17,7 @@ class UploadViewModel : ViewModel() {
 
     private val _uploadStatus = MutableLiveData<UploadState>()
     val upload: LiveData<UploadState> = _uploadStatus
+
     fun uploadAudioFile(file: File) {
         viewModelScope.launch {
             try {
@@ -28,16 +29,41 @@ class UploadViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     val responseBody = response.body()?.string()
-                    val message = responseBody?.let {
+                    responseBody?.let {
                         try {
-                            JSONObject(it).getString("message")
-                        } catch (e: Exception) {
-                            "Upload successful, but no message"
-                        }
-                    } ?: "Upload successful, but no message"
+                            val json = JSONObject(it)
+                            val status = json.optString("status", "unknown")
+                            val result = json.optString("result", "No result")
 
-                    _uploadStatus.postValue(UploadState.Success(message))
-                    Log.d("NETAPP", "Audio uploaded successfully: $message")
+
+                            val feedback = try {
+                                val feedbackArray = json.optJSONArray("feedback")
+                                val feedbackList = mutableListOf<String>()
+                                feedbackArray?.let {
+                                    for (i in 0 until it.length()) {
+                                        feedbackList.add(it.getString(i))
+                                    }
+                                }
+                                feedbackList
+                            } catch (e: Exception) {
+                                emptyList<String>()
+                            }
+
+                            if (status == "success") {
+                                _uploadStatus.postValue(UploadState.Success(feedback, result))
+                                Log.d("NETAPP", "Audio uploaded successfully: Feedback = $feedback, Result = $result")
+                            } else {
+                                _uploadStatus.postValue(UploadState.Error("Upload failed: $status"))
+                                Log.e("NETAPP", "Audio upload failed: $status")
+                            }
+                        } catch (e: Exception) {
+                            _uploadStatus.postValue(UploadState.Error("Invalid server response"))
+                            Log.e("NETAPP", "Error parsing response", e)
+                        }
+                    } ?: run {
+                        _uploadStatus.postValue(UploadState.Error("Empty server response"))
+                        Log.e("NETAPP", "Empty response from server")
+                    }
                 } else {
                     _uploadStatus.postValue(UploadState.Error("Error ${response.code()}: ${response.message()}"))
                     Log.e("NETAPP", "Audio upload failed: ${response.code()} - ${response.message()}")
@@ -50,12 +76,8 @@ class UploadViewModel : ViewModel() {
     }
 }
 
-
 sealed class UploadState {
     object Uploading : UploadState()
-    data class Success(val message: String) : UploadState()
+    data class Success(val feedback: List<String>, val result: String) : UploadState()
     data class Error(val message: String) : UploadState()
 }
-
-
-

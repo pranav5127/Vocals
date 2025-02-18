@@ -37,6 +37,7 @@ import java.io.File
 import java.io.InputStream
 
 
+
 class RecordViewModelFactory(private val context: Context): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RecorderViewModel::class.java)) {
@@ -44,9 +45,9 @@ class RecordViewModelFactory(private val context: Context): ViewModelProvider.Fa
             return RecorderViewModel(context) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
-
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordSendAudioScreen(
@@ -93,7 +94,6 @@ fun RecordSendAudioScreen(
             val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
             val fileName = getFileName(context, uri)
 
-            // Check if the file is a .wav file
             if (!fileName.endsWith(".wav", ignoreCase = true)) {
                 Toast.makeText(context, "Only .wav files are allowed", Toast.LENGTH_SHORT).show()
                 return null
@@ -113,10 +113,10 @@ fun RecordSendAudioScreen(
         }
     }
 
-    // Function to handle the picked audio file URI
+
     val pickAudioFile = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            // Ensure it's an internal storage file by checking the scheme (e.g., "content", "file")
+
             if (it.scheme == "content" || it.scheme == "file") {
                 val file = getFileFromUri(context, it)
                 if (file != null) {
@@ -135,7 +135,7 @@ fun RecordSendAudioScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Stut Fix") },
+                title = { Text("Vocals") },
                 actions = {
                     IconButton(onClick = { expanded = !expanded }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More options")
@@ -150,7 +150,8 @@ fun RecordSendAudioScreen(
                             onClick = {
                                 expanded = false
                                 showDialog = true
-                                pickAudioFile.launch("audio/wav") // Only allow .wav file selection
+                                pickAudioFile.launch("audio/wav")
+
                             }
                         )
                     }

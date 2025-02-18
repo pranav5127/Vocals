@@ -1,28 +1,10 @@
 package com.app.sounds.ui.view.response
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -40,28 +22,25 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResponseScreen(filePath: String, navController: NavController) {
-
     val file = File(filePath)
     val uri = file.absolutePath
     val uploadViewModel: UploadViewModel = viewModel()
     val uploadStatus = uploadViewModel.upload.observeAsState(initial = null).value
 
-    androidx.compose.runtime.LaunchedEffect(Unit) {
+    // Trigger upload
+    androidx.compose.runtime.LaunchedEffect(filePath) {
         uploadViewModel.uploadAudioFile(file)
     }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text("Results")
-                },
+                title = { Text("Results") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate(Screen.RecordSendAudioScreen.route) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
-
             )
         }
     ) { paddingValues ->
@@ -72,7 +51,6 @@ fun ResponseScreen(filePath: String, navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             // Audio Player Card
             Card(
                 modifier = Modifier
@@ -106,13 +84,18 @@ fun ResponseScreen(filePath: String, navController: NavController) {
                             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         }
                         is UploadState.Success -> {
-
-                            LazyColumn {
+                            val successState = uploadStatus as UploadState.Success
+                            LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 item {
-                                    Text(
-                                        text = (uploadStatus as UploadState.Success).message,
-                                        modifier = Modifier.padding(8.dp)
-                                    )
+                                    Text(text = "Upload Successful!", color = Color.Green)
+                                    Spacer(Modifier.height(8.dp))
+                                    Text(text = successState.result, color = Color.White)
+                                    Spacer(Modifier.height(8.dp))
+
+                                    // Displaying each feedback item in a list
+                                    successState.feedback.forEach { feedbackItem ->
+                                        Text(text = feedbackItem, color = Color.White)
+                                    }
                                 }
                             }
                         }
@@ -127,6 +110,7 @@ fun ResponseScreen(filePath: String, navController: NavController) {
             }
 
             Spacer(Modifier.height(24.dp))
+
 
             Button(
                 onClick = { navController.navigate(Screen.RecordSendAudioScreen.route) },
