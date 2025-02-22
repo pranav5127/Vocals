@@ -1,4 +1,4 @@
-# Sounds App
+# Vocals App
 
 A modern Android application built with Kotlin and Jetpack Compose for recording, uploading, and playing audio files. This application allows users to record their vocals, visualize audio waveforms in real time, upload WAV files to a backend server, and play audio with full control over playback.
 
