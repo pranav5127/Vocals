@@ -33,10 +33,3 @@ The project is organized into several packages:
 - **`com.app.sounds.viewmodel`:**  
   Handles permission requests and integrates the ViewModel layer to coordinate recording and uploading logic.
 
-## Setup & Installation
-
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/yourusername/sounds-app.git
-   cd sounds-app
