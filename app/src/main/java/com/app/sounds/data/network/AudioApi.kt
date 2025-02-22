@@ -9,7 +9,7 @@ import retrofit2.http.Part
 
 interface AudioApi{
     @Multipart
-    @POST("upload/")
+    @POST("/api/detect")
     suspend fun uploadAudio(
         @Part file: MultipartBody.Part
     ): Response<ResponseBody>
