@@ -54,7 +54,7 @@ class UploadViewModel : ViewModel() {
                                 Log.d("NETAPP", "Audio uploaded successfully: Feedback = $feedback, Result = $result")
                             } else {
                                 _uploadStatus.postValue(UploadState.Error("Upload failed: $status"))
-                                Log.e("NETAPP", "Audio upload failed: $status")
+                                Log.e("NETAPP", "Error: $status")
                             }
                         } catch (e: Exception) {
                             _uploadStatus.postValue(UploadState.Error("Invalid server response"))

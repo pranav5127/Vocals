@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit
 
 object AudioRepository {
 
-    private const val BASE_URL = "http://192.168.95.11:8000"
+    private const val BASE_URL = " https://faa2-2409-4064-4e4e-1cf1-baf1-ad4b-ad-f3bd.ngrok-free.app"
 
    private val client = OkHttpClient.Builder()
-       .connectTimeout(30, TimeUnit.SECONDS)
-       .readTimeout(30, TimeUnit.SECONDS)
+       .connectTimeout(120, TimeUnit.SECONDS)
+       .readTimeout(120, TimeUnit.SECONDS)
        .build()
 
     val instance: AudioApi by lazy {
